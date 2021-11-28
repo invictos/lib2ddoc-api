@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo lib2ddoc</title>
+</head>
+<style>
+    video,
+    canvas {
+        width: 300px;
+        height: auto;
+    }
+
+    #video,
+    #startbutton,
+    #videoH3 {
+        display: none;
+    }
+</style>
+
+<body>
+    <h1>Demo lib2ddoc</h1>
+    <h2>Charger une image</h2>
+    <h3 id="videoH3">Depuis video</h3>
+    <video id="video"></video><button id="startbutton">Prendre une photo</button>
+    <h3>Depuis fichier</h3>
+    <input type="file" id="imageInput">
+    <h2>Image chargée:</h2>
+    <canvas id="canvas"></canvas><button id="decodebutton">Decoder !</button>
+    <h2>Résultat</h2>
+    <pre>
+        <code id="code"></code>
+    </pre>
+
+    <script>
+        var video = document.querySelector('#video'),
+            videoCaptureButton = document.querySelector('#startbutton'),
+            imageInput = document.querySelector('#imageInput'),
+            decodeButton = document.querySelector('#decodebutton'),
+            canvas = document.querySelector('#canvas'),
+            code = document.querySelector('#code'),
+            width = 300,
+            height;
+
+        //Async start video from user
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        }).then(stream => {
+            video.srcObject = stream;
+            console.log("Playing stream: ", stream);
+            video.play();
+        }).catch(err => {
+            console.log("An error occured! " + err);
+        });
+
+        //Adjust aspect ratio
+        video.addEventListener('canplay', function (ev) {
+            height = video.videoHeight / (video.videoWidth / width);
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+        }, false);
+
+        //Load video to canvas
+        videoCaptureButton.addEventListener('click', function (ev) {
+            canvas.width = video.width;
+            canvas.height = video.height;
+            canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+            ev.preventDefault();
+        }, false);
+
+        imageInput.onchange = function (e) {
+            var img = new Image();
+            img.onload = draw;
+            img.onerror = failed;
+            img.src = URL.createObjectURL(this.files[0]);
+        };
+        function draw() {
+            var canvas = document.getElementById('canvas');
+            canvas.width = this.width;
+            canvas.height = this.height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(this, 0, 0);
+        }
+        function failed() {
+            console.error("The provided file couldn't be loaded as an Image media");
+        }
+
+        decodeButton.addEventListener('click', function (ev) {
+            //var image = canvas.getContext('2d').getImageData(0 ,0 ,canvas.width, canvas.height);
+            //var pixels_base64 = btoa(pixels);
+            var image = canvas.toDataURL();
+            console.log(image);
+
+            //Send the request, put result in page's content
+            fetch("/decode", {
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/octet-stream"
+                },
+                "body": image
+            }).then(res => res.text()).then(json => {
+                code.innerHTML = json;
+                console.log(json);
+            }).catch(err => {
+                console.error(err);
+            });
+        })
+    </script>
+</body>
+
+</html>
