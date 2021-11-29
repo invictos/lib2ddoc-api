@@ -46,7 +46,7 @@
             height;
 
         //Async start video from user
-        navigator.mediaDevices.getUserMedia({
+/*         navigator.mediaDevices.getUserMedia({
             video: true,
             audio: false
         }).then(stream => {
@@ -55,7 +55,7 @@
             video.play();
         }).catch(err => {
             console.log("An error occured! " + err);
-        });
+        }); */
 
         //Adjust aspect ratio
         video.addEventListener('canplay', function (ev) {
