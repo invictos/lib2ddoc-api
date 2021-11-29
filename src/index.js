@@ -18,7 +18,7 @@ app.use(bodyParser.raw({
 
 //Define the library API (see r2ddoc.h)
 //http://jakegoulding.com/rust-ffi-omnibus/string_return/
-var libr2ddoc = ffi.Library('src/libr2ddoc.so', {
+var libr2ddoc = ffi.Library('lib/libr2ddoc.so', {
     "lib2ddoc_data_to_json": ['char *', ['char *', 'int']],
     "lib2ddoc_image_to_json": ['char *', ['char *', 'int', 'int', 'int']],
     "lib2ddoc_free_json": ['void', ['char *']]
