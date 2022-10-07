@@ -1,3 +1,14 @@
 # lib2ddoc-api
 
-NodeJS api for lib2ddoc
+🚀 MVP for [lib2ddoc](https://github.com/invictos/lib2ddoc)
+
+## Usage
+
+```bash
+$ npm install
+$ npm serve
+```
+
+## 🧰 Demo
+
+![Demo](asset/readme.png)
